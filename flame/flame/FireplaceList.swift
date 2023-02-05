@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct ContentView: View {
-  @Environment(\.fireplaceService) var fireplaceService
+struct ContentView<T: FireplaceService>: View {
+  @EnvironmentObject var fireplaceService: T
   @State var fireplaces: [Fireplace] = []
   @State var selectedFireplace: Fireplace?
   @State var showFireplaceDetail: Bool = false
@@ -32,13 +32,14 @@ struct ContentView: View {
       }
     }
     .padding()
-    .task {
-      self.fireplaces = await fireplaceService.listFireplaces()
-    }
     .sheet(isPresented: $showFireplaceDetail) {
       switch selectedFireplace {
       case .some(let fireplace):
-        FireplaceDetail(fireplace: fireplace)
+        FireplaceDetail<T>(fireplace: Binding(get: {
+          fireplaceService.fireplaces.first { $0 == fireplace }!
+        }, set: { _, _ in
+
+        }))
           .onDisappear {
             selectedFireplace = nil
           }
@@ -50,6 +51,12 @@ struct ContentView: View {
       withAnimation {
         showFireplaceDetail = selectedFireplace != nil
       }
+    }
+    .onAppear {
+      self.fireplaces = fireplaceService.fireplaces
+    }
+    .onChange(of: fireplaceService.fireplaces) { fireplaces in
+      self.fireplaces = fireplaces
     }
   }
 
@@ -64,8 +71,8 @@ struct ContentView: View {
         VStack(alignment: .leading) {
           Text(fireplace.name)
             .font(.body)
-          if case let .on(requestedTime, timeRemaining) = fireplace.status {
-            Text("\(requestedTime), \(timeRemaining)")
+          if case let .on(timeRemaining) = fireplace.status {
+            Text("\(timeRemaining)")
               .font(.caption)
               .foregroundColor(.gray)
           }
@@ -79,7 +86,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView()
-      .environment(\.fireplaceService, .mock)
+    ContentView<LiveFireplaceService>()
+      .environmentObject(LiveFireplaceService())
   }
 }

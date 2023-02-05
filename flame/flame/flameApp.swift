@@ -11,8 +11,8 @@ import SwiftUI
 struct flameApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
-            .environment(\.fireplaceService, .mock)
+            ContentView<LiveFireplaceService>()
+            .environmentObject(LiveFireplaceService())
             .tint(Color.orange)
         }
     }

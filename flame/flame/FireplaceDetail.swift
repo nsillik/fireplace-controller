@@ -8,10 +8,10 @@
 import Foundation
 import SwiftUI
 
-struct FireplaceDetail: View {
-  @State var fireplace: Fireplace
+struct FireplaceDetail<T: FireplaceService>: View {
+  @Binding var fireplace: Fireplace
   @AppStorage("org.sillik.flame.selectedTime") var selectedTime: Int = 30 // default to 30 minutes
-  @Environment(\.fireplaceService) var fireplaceService
+  @EnvironmentObject var fireplaceService: T
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -21,7 +21,7 @@ struct FireplaceDetail: View {
           Spacer()
           Button {
             Task {
-              await fireplaceService.turnOnFireplace(fireplace, selectedTime)
+              await fireplaceService.turnOnFireplace(fireplace, minutes: UInt16(truncatingIfNeeded: selectedTime))
             }
           } label: {
             Text("Start")
@@ -78,11 +78,11 @@ struct FireplaceDetail: View {
 struct FireplaceDetail_Previews: PreviewProvider {
   static var previews: some View {
     Group {
-      FireplaceDetail(fireplace: .init(id: UUID(), name: "Dog Crate Room", status: .on(timeRequested: 30 * 60, timeRemaining: 23.3 * 60)))
+      FireplaceDetail<LiveFireplaceService>(fireplace: .constant(.init(ipAddress: "192.168.1.81", name: "Dog Crate Room", status: .on(timeRemaining: 23.3 * 60))))
         .previewDisplayName("On Fireplace")
-      FireplaceDetail(fireplace: .init(id: UUID(), name: "Dog Crate Room", status: .off))
+      FireplaceDetail<LiveFireplaceService>(fireplace: .constant(.init(ipAddress: "192.168.1.82", name: "Dog Crate Room", status: .off)))
         .previewDisplayName("Off Fireplace")
     }
-    .environment(\.fireplaceService, .mock)
+    .environmentObject(LiveFireplaceService())
   }
 }

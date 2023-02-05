@@ -5,6 +5,7 @@
 #include "esp_log.h"
 #include "esp_err.h"
 #include "wifi.h"
+#include "listener.h"
 
 #define LED_PIN 22
 
@@ -27,8 +28,11 @@ void app_main() {
       ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+    ESP_ERROR_CHECK(esp_netif_init());
 
     ESP_LOGI("FLICKER", "ESP_WIFI_MODE_STA");
     wifi_init_sta();
-    xTaskCreate(&led_blink,"LED_BLINK",512,NULL,5,NULL);
+    xTaskCreate(&udp_server_task, "udp_server", 4096, (void*)AF_INET, 5, NULL);
+    xTaskCreate(&led_blink,"LED_BLINK",4096,NULL,5,NULL);
+    xTaskCreate(&statusLoop,"STATUS_LOOP",4096,NULL,5,NULL);
 }
