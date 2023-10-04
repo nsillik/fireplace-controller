@@ -7,8 +7,6 @@
 #include "wifi.h"
 #include "listener.h"
 
-#define LED_PIN 22
-
 void app_main() {
     //Initialize NVS
     esp_err_t ret = nvs_flash_init();
