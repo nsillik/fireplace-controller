@@ -8,10 +8,10 @@
 import SwiftUI
 
 @main
-struct flameApp: App {
+struct FlameApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView<LiveFireplaceService>()
+            MainScreen<LiveFireplaceService>()
             .environmentObject(LiveFireplaceService())
             .tint(Color.orange)
         }

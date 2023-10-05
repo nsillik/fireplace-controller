@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct Fireplace: Identifiable, Equatable, Hashable {
+struct Fireplace: Identifiable, Equatable, Hashable, CustomStringConvertible {
+
+  var description: String { self.name }
 
   static func ==(lhs: Fireplace, rhs: Fireplace) -> Bool {
     return lhs.id == rhs.id
@@ -26,6 +28,15 @@ struct Fireplace: Identifiable, Equatable, Hashable {
 
   enum Status: Equatable, Hashable {
     case off, on(timeRemaining: TimeInterval), unknown
+
+    var isOn: Bool {
+      switch self {
+      case .on(timeRemaining: _):
+        true
+      default:
+        false
+      }
+    }
 
     static func fromServerValue(_ value: UInt16) -> Self {
       if value >> 14 == 0 {

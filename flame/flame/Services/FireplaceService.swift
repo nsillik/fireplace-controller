@@ -150,3 +150,35 @@ class LiveFireplaceService: FireplaceService {
     return fireplace
   }
 }
+
+class PreviewFireplaceService: FireplaceService {
+  @Published var fireplaces: [Fireplace] = [
+    .init(ipAddress: "a", name: "Living Room", status: .off),
+    .init(ipAddress: "b", name: "Bedroom", status: .off),
+    .init(ipAddress: "c", name: "Dungeon", status: .off)
+  ]
+
+  func turnOnFireplace(_ fireplace: Fireplace, minutes: UInt16) async -> Fireplace {
+    fireplaces = fireplaces.map { f in
+      var new = f
+      if f == fireplace {
+        new.status = .on(timeRemaining: Double(minutes) * 60.0)
+      }
+      return new
+    }
+    return fireplaces.first(where: { $0 == fireplace })! // TODO(nsillik): Get rid of the `!`
+  }
+
+  func turnOffFireplace(_ fireplace: Fireplace) async -> Fireplace {
+    fireplaces = fireplaces.map { f in
+      var new = f
+      if f == fireplace {
+        new.status = .off
+      }
+      return new
+    }
+    return fireplaces.first(where: { $0 == fireplace })! // TODO(nsillik): Get rid of the `!`
+  }
+
+
+}

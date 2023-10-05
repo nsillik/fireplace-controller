@@ -7,27 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C80606D62969D8F2000364C6 /* flameApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80606D52969D8F2000364C6 /* flameApp.swift */; };
-		C80606D82969D8F2000364C6 /* FireplaceList.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80606D72969D8F2000364C6 /* FireplaceList.swift */; };
+		C80606D62969D8F2000364C6 /* FlameApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80606D52969D8F2000364C6 /* FlameApp.swift */; };
+		C80606D82969D8F2000364C6 /* MainScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80606D72969D8F2000364C6 /* MainScreen.swift */; };
 		C80606DA2969D8F3000364C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C80606D92969D8F3000364C6 /* Assets.xcassets */; };
 		C80606DE2969D8F3000364C6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C80606DD2969D8F3000364C6 /* Preview Assets.xcassets */; };
 		C80606E62969D929000364C6 /* FireplaceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80606E52969D929000364C6 /* FireplaceService.swift */; };
 		C80606E92969DBC5000364C6 /* Fireplace.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80606E82969DBC5000364C6 /* Fireplace.swift */; };
-		C80606EB2969DD3C000364C6 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80606EA2969DD3C000364C6 /* HeaderView.swift */; };
-		C80606ED2969E083000364C6 /* FireplaceDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80606EC2969E083000364C6 /* FireplaceDetail.swift */; };
+		C83C91BD2ACDD07F00C400D5 /* Picker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C83C91BC2ACDD07F00C400D5 /* Picker.swift */; };
+		C8F2C09C2ACE117A008CC23D /* BackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2C09B2ACE117A008CC23D /* BackgroundView.swift */; };
+		C8F2C09E2ACE1B00008CC23D /* StartButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2C09D2ACE1B00008CC23D /* StartButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		C80606D22969D8F2000364C6 /* flame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = flame.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C80606D52969D8F2000364C6 /* flameApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = flameApp.swift; sourceTree = "<group>"; };
-		C80606D72969D8F2000364C6 /* FireplaceList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireplaceList.swift; sourceTree = "<group>"; };
+		C80606D52969D8F2000364C6 /* FlameApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameApp.swift; sourceTree = "<group>"; };
+		C80606D72969D8F2000364C6 /* MainScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreen.swift; sourceTree = "<group>"; };
 		C80606D92969D8F3000364C6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C80606DB2969D8F3000364C6 /* flame.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = flame.entitlements; sourceTree = "<group>"; };
 		C80606DD2969D8F3000364C6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C80606E52969D929000364C6 /* FireplaceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireplaceService.swift; sourceTree = "<group>"; };
 		C80606E82969DBC5000364C6 /* Fireplace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fireplace.swift; sourceTree = "<group>"; };
-		C80606EA2969DD3C000364C6 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
-		C80606EC2969E083000364C6 /* FireplaceDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireplaceDetail.swift; sourceTree = "<group>"; };
+		C83C91BC2ACDD07F00C400D5 /* Picker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Picker.swift; sourceTree = "<group>"; };
+		C8F2C09B2ACE117A008CC23D /* BackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
+		C8F2C09D2ACE1B00008CC23D /* StartButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,15 +62,14 @@
 		C80606D42969D8F2000364C6 /* flame */ = {
 			isa = PBXGroup;
 			children = (
+				C83C91BB2ACDD07200C400D5 /* Views */,
 				C80606E72969DBBE000364C6 /* Models */,
 				C80606E42969D91C000364C6 /* Services */,
-				C80606D52969D8F2000364C6 /* flameApp.swift */,
-				C80606D72969D8F2000364C6 /* FireplaceList.swift */,
+				C80606D52969D8F2000364C6 /* FlameApp.swift */,
+				C80606D72969D8F2000364C6 /* MainScreen.swift */,
 				C80606D92969D8F3000364C6 /* Assets.xcassets */,
 				C80606DB2969D8F3000364C6 /* flame.entitlements */,
 				C80606DC2969D8F3000364C6 /* Preview Content */,
-				C80606EA2969DD3C000364C6 /* HeaderView.swift */,
-				C80606EC2969E083000364C6 /* FireplaceDetail.swift */,
 			);
 			path = flame;
 			sourceTree = "<group>";
@@ -95,6 +96,16 @@
 				C80606E82969DBC5000364C6 /* Fireplace.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		C83C91BB2ACDD07200C400D5 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C83C91BC2ACDD07F00C400D5 /* Picker.swift */,
+				C8F2C09B2ACE117A008CC23D /* BackgroundView.swift */,
+				C8F2C09D2ACE1B00008CC23D /* StartButton.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,12 +178,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C80606ED2969E083000364C6 /* FireplaceDetail.swift in Sources */,
-				C80606EB2969DD3C000364C6 /* HeaderView.swift in Sources */,
+				C8F2C09C2ACE117A008CC23D /* BackgroundView.swift in Sources */,
+				C83C91BD2ACDD07F00C400D5 /* Picker.swift in Sources */,
 				C80606E62969D929000364C6 /* FireplaceService.swift in Sources */,
 				C80606E92969DBC5000364C6 /* Fireplace.swift in Sources */,
-				C80606D82969D8F2000364C6 /* FireplaceList.swift in Sources */,
-				C80606D62969D8F2000364C6 /* flameApp.swift in Sources */,
+				C8F2C09E2ACE1B00008CC23D /* StartButton.swift in Sources */,
+				C80606D82969D8F2000364C6 /* MainScreen.swift in Sources */,
+				C80606D62969D8F2000364C6 /* FlameApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,7 +309,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"flame/Preview Content\"";
-				DEVELOPMENT_TEAM = Q732PZMNL2;
+				DEVELOPMENT_TEAM = T9G4KUKSVP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -335,7 +347,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"flame/Preview Content\"";
-				DEVELOPMENT_TEAM = Q732PZMNL2;
+				DEVELOPMENT_TEAM = T9G4KUKSVP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
