@@ -32,14 +32,12 @@ protocol FireplaceService: ObservableObject {
 }
 
 class LiveFireplaceService: FireplaceService {
-  @Published var fireplaces: [Fireplace] = [
-    Fireplace(ipAddress: "192.168.1.81", name: "Bedroom", status: .off),
-    //    Fireplace(ipAddress: "192.168.1.82", name: "Bedroom", status: .off)
-  ]
+  @Binding var fireplaces: [Fireplace]
   var cancellables = [AnyCancellable]()
   var fireplaceToConnection = [Fireplace: NWConnection]()
   
-  init() {
+  init(fireplaces: Binding<[Fireplace]>) {
+    self._fireplaces = fireplaces
     self.fireplaces.forEach { fireplace in
       self.connectTo(fireplace)
     }
@@ -109,12 +107,12 @@ class LiveFireplaceService: FireplaceService {
             var fireplace = fireplace
             if fireplace == fireplace {
               fireplace.status = status
+              print("\(fireplace.status)")
             }
             return fireplace
           })
         }
       }
-      print("\(status)")
     }
   }
   
@@ -154,7 +152,7 @@ class LiveFireplaceService: FireplaceService {
 class PreviewFireplaceService: FireplaceService {
   @Published var fireplaces: [Fireplace] = [
     .init(ipAddress: "a", name: "Living Room", status: .off),
-    .init(ipAddress: "b", name: "Bedroom", status: .off),
+    .init(ipAddress: "b", name: "Bedroom", status: .on(timeRemaining: 30.0 * 60.0)),
     .init(ipAddress: "c", name: "Dungeon", status: .off)
   ]
 
@@ -177,7 +175,7 @@ class PreviewFireplaceService: FireplaceService {
       }
       return new
     }
-    return fireplaces.first(where: { $0 == fireplace })! // TODO(nsillik): Get rid of the `!`
+    return fireplaces.first(where: { $0.id == fireplace.id })! // TODO(nsillik): Get rid of the `!`
   }
 
 

@@ -26,7 +26,6 @@ struct Picker<T: CustomStringConvertible & Hashable>: View {
           .animation(.linear(duration: 0.1), value: currentlySelected)
           .frame(width: 18)
       }
-      .offset(x: 18)
       if (expanded) {
         ForEach(options, id: \.self) { option in
           HStack {

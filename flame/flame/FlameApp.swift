@@ -9,11 +9,16 @@ import SwiftUI
 
 @main
 struct FlameApp: App {
-    var body: some Scene {
-        WindowGroup {
-            MainScreen<LiveFireplaceService>()
-            .environmentObject(LiveFireplaceService())
-            .tint(Color.orange)
-        }
+  @State var fireplaces: [Fireplace] = [
+    Fireplace(ipAddress: "192.168.1.81", name: "Bedroom", status: .off),
+    //    Fireplace(ipAddress: "192.168.1.82", name: "Bedroom", status: .off)
+  ]
+  var body: some Scene {
+    WindowGroup {
+      MainScreen<LiveFireplaceService>()
+        .environmentObject(LiveFireplaceService(fireplaces: $fireplaces))
+        .tint(Color.orange)
+        .environment(\.colorScheme, .dark)
     }
+  }
 }

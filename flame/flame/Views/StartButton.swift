@@ -12,7 +12,7 @@ struct StartButton: View {
       ZStack {
         Image("glass")
         VStack(spacing: 0) {
-          Text("􀙭")
+          Image(systemName: "flame.fill")
             .font(
               Font.custom("SF Pro Display", size: 54)
                 .weight(.semibold)

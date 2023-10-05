@@ -11,10 +11,6 @@ struct Fireplace: Identifiable, Equatable, Hashable, CustomStringConvertible {
 
   var description: String { self.name }
 
-  static func ==(lhs: Fireplace, rhs: Fireplace) -> Bool {
-    return lhs.id == rhs.id
-  }
-
   func hash(into hasher: inout Hasher) {
     hasher.combine(id)
   }
