@@ -8,28 +8,28 @@
 import SwiftUI
 
 struct BackgroundView: View {
-  var isOn = false
-
+  @State var isOn = false
+  
   var body: some View {
     Group {
-      switch isOn {
-      case true:
-        ZStack {
-          onGradient
-            .offset(x: -200, y: -200)
-          onGradient
-            .offset(x: 200, y: 200)
-        }
-      case false:
-        ZStack {
-          offGradient
-            .offset(x: -80, y: 200)
-        }
+      ZStack {
+        onGradient
+          .tag("h")
+          .offset(x: -200, y: -200)
+          .opacity(isOn ? 1.0 : 0.0)
+        onGradient
+          .offset(x: 200, y: 200)
+          .opacity(isOn ? 1.0 : 0.0)
+        offGradient
+          .tag("h")
+          .offset(x: -80, y: 200)
+          .opacity(isOn ? 0.0 : 1.0)
       }
     }
+    .animation(.easeIn, value: isOn)
     .background(Color.black)
   }
-
+  
   var offGradient: some View {
     ZStack {
       Rectangle()
@@ -63,7 +63,7 @@ struct BackgroundView: View {
         .blur(radius: 100)
     }
   }
-
+  
   var onGradient: some View {
     ZStack {
       Rectangle()

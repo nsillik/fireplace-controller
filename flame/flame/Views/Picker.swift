@@ -26,6 +26,9 @@ struct Picker<T: CustomStringConvertible & Hashable>: View {
           .animation(.linear(duration: 0.1), value: currentlySelected)
           .frame(width: 18)
       }
+      .safeAreaInset(edge: .top) {
+        Text("").padding(.bottom, 16) // This is just to position the content correctly outside of the safe area while allowing the background to cover the safe area when the picker is open
+      }
       if (expanded) {
         ForEach(options, id: \.self) { option in
           HStack {
@@ -63,6 +66,8 @@ struct Picker<T: CustomStringConvertible & Hashable>: View {
       expanded = !expanded
     }
     .animation(.easeIn, value: expanded)
+    .foregroundColor(.white)
+    .edgesIgnoringSafeArea(.top)
   }
 
   var topText: String {
@@ -99,6 +104,5 @@ struct Picker_PreviewProvider: PreviewProvider {
         Spacer()
       }
     }
-    .frame(width: 400, height: 600)
   }
 }
