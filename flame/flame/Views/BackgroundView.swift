@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct BackgroundView: View {
-  @State var isOn = false
-  
+  var isOn: Bool
+
   var body: some View {
     Group {
       ZStack {
@@ -29,7 +29,7 @@ struct BackgroundView: View {
     .animation(.easeIn, value: isOn)
     .background(Color.black)
   }
-  
+
   var offGradient: some View {
     ZStack {
       Rectangle()
@@ -63,7 +63,7 @@ struct BackgroundView: View {
         .blur(radius: 100)
     }
   }
-  
+
   var onGradient: some View {
     ZStack {
       Rectangle()
@@ -101,5 +101,10 @@ struct BackgroundView: View {
 
 
 #Preview {
-  BackgroundView()
+  Group {
+    BackgroundView(isOn: true)
+      .previewDisplayName("ON")
+    BackgroundView(isOn: false)
+      .previewDisplayName("OFF")
+  }
 }

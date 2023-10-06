@@ -46,7 +46,7 @@ class LiveFireplaceService: FireplaceService {
       self.receive(fireplace: fireplace, connection: connection)
     }
     
-    Timer.publish(every: 0.333, on: .main, in: .default)
+    Timer.publish(every: 20, on: .main, in: .default)
       .autoconnect()
       .sink { _ in
         self.fireplaceToConnection.forEach { (fireplace: Fireplace, connection: NWConnection) in

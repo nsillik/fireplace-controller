@@ -15,7 +15,6 @@
 		C80606E92969DBC5000364C6 /* Fireplace.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80606E82969DBC5000364C6 /* Fireplace.swift */; };
 		C83C91BD2ACDD07F00C400D5 /* Picker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C83C91BC2ACDD07F00C400D5 /* Picker.swift */; };
 		C8F2C09C2ACE117A008CC23D /* BackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2C09B2ACE117A008CC23D /* BackgroundView.swift */; };
-		C8F2C09E2ACE1B00008CC23D /* StartButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2C09D2ACE1B00008CC23D /* StartButton.swift */; };
 		C8F2C0A02ACF456F008CC23D /* GlassButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F2C09F2ACF456F008CC23D /* GlassButton.swift */; };
 /* End PBXBuildFile section */
 
@@ -30,7 +29,6 @@
 		C80606E82969DBC5000364C6 /* Fireplace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fireplace.swift; sourceTree = "<group>"; };
 		C83C91BC2ACDD07F00C400D5 /* Picker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Picker.swift; sourceTree = "<group>"; };
 		C8F2C09B2ACE117A008CC23D /* BackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
-		C8F2C09D2ACE1B00008CC23D /* StartButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartButton.swift; sourceTree = "<group>"; };
 		C8F2C09F2ACF456F008CC23D /* GlassButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -105,7 +103,6 @@
 			children = (
 				C83C91BC2ACDD07F00C400D5 /* Picker.swift */,
 				C8F2C09B2ACE117A008CC23D /* BackgroundView.swift */,
-				C8F2C09D2ACE1B00008CC23D /* StartButton.swift */,
 				C8F2C09F2ACF456F008CC23D /* GlassButton.swift */,
 			);
 			path = Views;
@@ -186,7 +183,6 @@
 				C8F2C0A02ACF456F008CC23D /* GlassButton.swift in Sources */,
 				C80606E62969D929000364C6 /* FireplaceService.swift in Sources */,
 				C80606E92969DBC5000364C6 /* Fireplace.swift in Sources */,
-				C8F2C09E2ACE1B00008CC23D /* StartButton.swift in Sources */,
 				C80606D82969D8F2000364C6 /* MainScreen.swift in Sources */,
 				C80606D62969D8F2000364C6 /* FlameApp.swift in Sources */,
 			);
@@ -311,7 +307,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = flame/flame.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"flame/Preview Content\"";
 				DEVELOPMENT_TEAM = T9G4KUKSVP;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -349,7 +345,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = flame/flame.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"flame/Preview Content\"";
 				DEVELOPMENT_TEAM = T9G4KUKSVP;
 				ENABLE_HARDENED_RUNTIME = YES;
