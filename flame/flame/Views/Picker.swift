@@ -37,6 +37,12 @@ struct Picker<T: CustomStringConvertible & Hashable>: View {
               .frame(width: 16)
               .animation(.linear(duration: 0.1), value: currentlySelected)
             Text(option.description)
+              .font(
+                Font.custom("SF Pro Display", size: 16)
+                  .weight(.light)
+              )
+              .multilineTextAlignment(.center)
+              .foregroundColor(.white)
               .onTapGesture {
                 expanded = !expanded
                 currentlySelected = option
@@ -46,8 +52,7 @@ struct Picker<T: CustomStringConvertible & Hashable>: View {
           }
           .offset(x: -16)
         }
-        .font(Font.custom("SF Pro Display", size: 16)
-          .weight(.light))
+
 
       }
     }
