@@ -102,8 +102,6 @@ struct BackgroundView: View {
 #Preview {
     Group {
         BackgroundView(isOn: true)
-            .previewDisplayName("ON")
         BackgroundView(isOn: false)
-            .previewDisplayName("OFF")
     }
 }

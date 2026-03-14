@@ -13,16 +13,20 @@ let project = Project(
             destinations: .iOS,
             product: .app,
             bundleId: "org.sillik.flame",
-            deploymentTargets: .iOS("16.0"),
+            deploymentTargets: .iOS("26.0"),
             infoPlist: .extendingDefault(with: [
                 "ITSAppUsesNonExemptEncryption": false,
+                "UILaunchScreen": .dictionary([:]),
             ]),
             sources: ["flame/**/*.swift"],
             resources: [
                 "flame/Assets.xcassets",
                 "flame/Preview Content/**",
             ],
-            entitlements: .file(path: "flame/flame.entitlements")
+            entitlements: .file(path: "flame/flame.entitlements"),
+            dependencies: [
+                .external(name: "ComposableArchitecture"),
+            ]
         ),
     ]
 )

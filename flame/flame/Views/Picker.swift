@@ -9,7 +9,7 @@ import SwiftUI
 
 struct Picker<T: CustomStringConvertible & Hashable>: View {
     let options: [T]
-    @Binding var currentlySelected: T?
+    @Binding var currentlySelected: T
     let placeholder: String
     let selected: (T) -> Void
     @State var expanded = false
@@ -78,7 +78,7 @@ struct Picker<T: CustomStringConvertible & Hashable>: View {
         case true:
             placeholder.uppercased()
         case false:
-            currentlySelected?.description.uppercased() ?? "UNKNOWN"
+            currentlySelected.description.uppercased()
         }
     }
 }

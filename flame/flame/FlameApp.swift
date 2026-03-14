@@ -6,19 +6,31 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 @main
 struct FlameApp: App {
-    @State var fireplaces: [Fireplace] = [
-        Fireplace(ipAddress: "192.168.1.81", name: "Bedroom", status: .off),
-        //    Fireplace(ipAddress: "192.168.1.82", name: "Bedroom", status: .off)
-    ]
     var body: some Scene {
         WindowGroup {
-            MainScreen<LiveFireplaceService>()
-                .environmentObject(LiveFireplaceService(fireplaces: $fireplaces))
-                .tint(Color.orange)
-                .environment(\.colorScheme, .dark)
+            screen
         }
+    }
+    
+    var screen: some View {
+//         MainScreen<LiveFireplaceService>()
+//        .environmentObject(LiveFireplaceService(fireplaces: $fireplaces))
+//        .tint(Color.orange)
+//        .environment(\.colorScheme, .dark)
+        AppScreen(
+            store: Store(
+                initialState: AppReducer.State(
+                    availableFireplaces: [],
+                    selectedFireplace: .init(ipAddress: "", name: "", status: .unknown)
+                ),
+                reducer: {
+                    AppReducer()
+                }
+            )
+        )
     }
 }
