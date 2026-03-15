@@ -16,11 +16,18 @@ struct AppReducer {
         var availableFireplaces: [Fireplace] = []
         var selectedFireplace: Fireplace = .init(ipAddress: "", name: "", status: .unknown)
         var currentTime: UInt16 = 30
-        var isOn = false
+        var isOn: Bool {
+            if case .on = selectedFireplace.status {
+                return true
+            } else {
+                return false
+            }
+        }
     }
     
     enum Action {
         case didLoad
+        case fireplaceStatusUpdated([Fireplace])
         case selectFireplace(Fireplace?)
         case turnOffFireplace(Fireplace)
         case turnOnFireplace(Fireplace)
@@ -31,27 +38,31 @@ struct AppReducer {
         Reduce { state, action in
             switch action {
             case .didLoad:
-                state.availableFireplaces = fireplaceService.fireplaces
-                state.selectedFireplace = fireplaceService.fireplaces.first!
-                return .publisher {
-                    fireplaceService.fireplaces.publisher
-                        .removeDuplicates()
-                        .map { _ in
-                                .didLoad
-                        }
+                return .run { send in
+                    let fireplaces = await fireplaceService.fireplaces
+                    await send(.fireplaceStatusUpdated(fireplaces))
+                    for await fireplaces in await fireplaceService.fireplaceUpdates() {
+                        await send(.fireplaceStatusUpdated(fireplaces))
+                    }
                 }
+            case .fireplaceStatusUpdated(let fireplaces):
+                state.availableFireplaces = fireplaces
+                if let updated = fireplaces.first(where: { $0.id == state.selectedFireplace.id }) {
+                    state.selectedFireplace = updated
+                }
+                return .none
             case .selectFireplace(let fireplace):
                 guard let fireplace else { return .none }
                 state.selectedFireplace = fireplace
                 return .none
             case .turnOffFireplace(let fireplace):
                 let fireplace = fireplace
-                return .run { send in
+                return .run { _ in
                     await fireplaceService.turnOffFireplace(fireplace)
                 }
             case .turnOnFireplace(let fireplace):
                 let currentTime = state.currentTime
-                return .run { end in
+                return .run { _ in
                     await fireplaceService.turnOnFireplace(fireplace, minutes: currentTime)
                 }
             case .incrementTime(let minutes):

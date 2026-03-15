@@ -10,10 +10,14 @@ import Foundation
 import Network
 import SwiftUI
 import ComposableArchitecture
+import os
+
+private let logger = Logger(subsystem: "flame", category: "fireplace")
+private let fireplacePort: UInt16 = 42069
 
 enum Command {
     case turnOff, getStatus, turnOn(minutes: UInt16)
-    
+
     var commandValue: UInt16 {
         switch self {
         case .turnOff:
@@ -26,144 +30,201 @@ enum Command {
     }
 }
 
-protocol FireplaceService: ObservableObject {
+@MainActor
+protocol FireplaceService {
     var fireplaces: [Fireplace] { get }
     var defaultMinutes: UInt16 { get }
-    func turnOnFireplace(_ fireplace: Fireplace, minutes: UInt16) async -> Fireplace
-    func turnOffFireplace(_ fireplace: Fireplace) async -> Fireplace
+    func turnOnFireplace(_ fireplace: Fireplace, minutes: UInt16) async
+    func turnOffFireplace(_ fireplace: Fireplace) async
+    func fireplaceUpdates() -> AsyncStream<[Fireplace]>
 }
 
+@MainActor
 @Observable
 class LiveFireplaceService: FireplaceService {
     var defaultMinutes: UInt16 = 30
-    
+
     var fireplaces: [Fireplace]
     var cancellables = [AnyCancellable]()
-    var fireplaceToConnection = [Fireplace: NWConnection]()
-    
+    var fireplaceToConnection = [Fireplace.ID: NWConnection]()
+    private var reconnectAttempts = [Fireplace.ID: Int]()
+
     init(fireplaces: [Fireplace]) {
         self.fireplaces = fireplaces
         for fireplace in self.fireplaces {
             connectTo(fireplace)
         }
-        
-        for (fireplace, connection) in fireplaceToConnection {
-            receive(fireplace: fireplace, connection: connection)
-        }
-        
+
         Timer.publish(every: 1, on: .main, in: .default)
             .autoconnect()
-            .sink { _ in
-                for (fireplace, connection) in self.fireplaceToConnection {
-                    self.requestStatus(fireplace: fireplace, connection: connection)
-                    self.receive(fireplace: fireplace, connection: connection)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                for (_, connection) in self.fireplaceToConnection {
+                    self.requestStatus(connection: connection)
                 }
             }
             .store(in: &cancellables)
     }
-    
+
     func connectTo(_ fireplace: Fireplace) {
-        let connection = NWConnection(host: .ipv4(.init(fireplace.ipAddress)!), port: .init(integerLiteral: 42069), using: .udp)
-        connection.stateUpdateHandler = { state in
-            switch state {
-            case .ready:
-                print("ready")
-                self.requestStatus(fireplace: fireplace, connection: connection)
-            case .setup:
-                print("setup")
-            case .cancelled:
-                self.fireplaceToConnection.removeValue(forKey: fireplace)
-                connection.cancel()
-                self.connectTo(fireplace)
-            case .preparing:
-                print("Preparing")
-            case let .failed(error):
-                print("Failed: \(error)")
-                self.connectTo(fireplace)
-            case let .waiting(error):
-                print("waiting: \(error)")
-            @unknown default:
-                print("unknown: \(state)")
+        let connection = NWConnection(host: .ipv4(.init(fireplace.ipAddress)!), port: .init(integerLiteral: fireplacePort), using: .udp)
+        connection.stateUpdateHandler = { [weak self] state in
+            Task { @MainActor in
+                guard let self else { return }
+                switch state {
+                case .ready:
+                    logger.info("Connection ready for \(fireplace.name)")
+                    self.reconnectAttempts[fireplace.id] = 0
+                    self.requestStatus(connection: connection)
+                case .setup:
+                    logger.debug("Connection setup for \(fireplace.name)")
+                case .cancelled:
+                    self.fireplaceToConnection.removeValue(forKey: fireplace.id)
+                    self.reconnectWithBackoff(fireplace)
+                case .preparing:
+                    logger.debug("Connection preparing for \(fireplace.name)")
+                case let .failed(error):
+                    logger.error("Connection failed for \(fireplace.name): \(error)")
+                    connection.cancel()
+                    self.fireplaceToConnection.removeValue(forKey: fireplace.id)
+                    self.reconnectWithBackoff(fireplace)
+                case let .waiting(error):
+                    logger.info("Connection waiting for \(fireplace.name): \(error)")
+                @unknown default:
+                    logger.warning("Unknown connection state for \(fireplace.name): \(String(describing: state))")
+                }
             }
         }
         connection.start(queue: .global())
         self.receive(fireplace: fireplace, connection: connection)
-        fireplaceToConnection[fireplace] = connection
+        fireplaceToConnection[fireplace.id] = connection
     }
-    
-    func requestStatus(fireplace _: Fireplace, connection: NWConnection) {
-        var message: Int16 = 0x4000 // Status
+
+    private func reconnectWithBackoff(_ fireplace: Fireplace) {
+        let attempt = reconnectAttempts[fireplace.id, default: 0]
+        reconnectAttempts[fireplace.id] = attempt + 1
+        let delay = min(pow(2.0, Double(attempt)), 30.0)
+        logger.info("Reconnecting to \(fireplace.name) in \(delay)s (attempt \(attempt + 1))")
+        Task {
+            try? await Task.sleep(for: .seconds(delay))
+            self.connectTo(fireplace)
+        }
+    }
+
+    func requestStatus(connection: NWConnection) {
+        var message = Command.getStatus.commandValue
         connection.send(content: Data(bytes: &message, count: 2), completion: NWConnection.SendCompletion.contentProcessed(({ _ in
-            print("sent: \(String(format: "0x%04x", message))")
+            logger.debug("Sent status request: \(String(format: "0x%04x", message))")
         })))
     }
-    
+
     func receive(fireplace: Fireplace, connection: NWConnection) {
-        connection.receiveMessage { data, _, _, _ in
-            guard let data = data else { return }
-            print("Got \(data.count) bytes")
-            guard data.count == 2 else { return }
-            
+        connection.receiveMessage { [weak self] data, _, _, _ in
+            guard let data = data else {
+                Task { @MainActor in
+                    self?.receive(fireplace: fireplace, connection: connection)
+                }
+                return
+            }
+            logger.debug("Got \(data.count) bytes from \(fireplace.name)")
+            guard data.count == 2 else {
+                Task { @MainActor in
+                    self?.receive(fireplace: fireplace, connection: connection)
+                }
+                return
+            }
+
             let returnedStatus = UInt16(data[1]) << 8 | UInt16(data[0])
             let status = Fireplace.Status.fromServerValue(returnedStatus)
-            Task {
-                await MainActor.run {
-                    self.fireplaces = self.fireplaces.map { fireplace in
-                        var fireplace = fireplace
-                        if fireplace == fireplace {
-                            fireplace.status = status
-                            print("\(fireplace.status)")
-                        }
-                        return fireplace
+            Task { @MainActor in
+                self?.fireplaces = self?.fireplaces.map { existing in
+                    var updated = existing
+                    if existing.id == fireplace.id {
+                        updated.status = status
+                        logger.debug("Updated \(fireplace.name) status: \(String(describing: status))")
                     }
-                }
+                    return updated
+                } ?? []
+                self?.receive(fireplace: fireplace, connection: connection)
             }
         }
     }
-    
-    func turnOnFireplace(_ fireplace: Fireplace, minutes: UInt16) async -> Fireplace {
-        guard let connection = fireplaceToConnection[fireplace] else {
-            print("Unable to get connection for fireplace: \(fireplace.name)")
-            return fireplace
+
+    func turnOnFireplace(_ fireplace: Fireplace, minutes: UInt16) async {
+        guard let connection = fireplaceToConnection[fireplace.id] else {
+            logger.error("Unable to get connection for fireplace: \(fireplace.name)")
+            return
         }
         let command = Command.turnOn(minutes: minutes)
         var commandValue = command.commandValue
-        print("sending command: \(command) (\(String(format: "0x%04x", commandValue)))")
+        logger.info("Sending command: \(String(describing: command)) (\(String(format: "0x%04x", commandValue)))")
         connection.send(content: Data(bytes: &commandValue, count: 2), completion: .contentProcessed { error in
             if let error = error {
-                print("got error sending: \(error)")
+                logger.error("Error sending turn on: \(error)")
             }
         })
-        return fireplace
     }
-    
-    func turnOffFireplace(_ fireplace: Fireplace) async -> Fireplace {
-        guard let connection = fireplaceToConnection[fireplace] else {
-            print("Unable to get connection for fireplace: \(fireplace.name)")
-            return fireplace
+
+    func fireplaceUpdates() -> AsyncStream<[Fireplace]> {
+        AsyncStream { continuation in
+            Task { @MainActor in
+                while !Task.isCancelled {
+                    await withCheckedContinuation { resume in
+                        withObservationTracking {
+                            _ = self.fireplaces
+                        } onChange: {
+                            Task { @MainActor in
+                                resume.resume()
+                            }
+                        }
+                    }
+                    continuation.yield(self.fireplaces)
+                }
+                continuation.finish()
+            }
+        }
+    }
+
+    func turnOffFireplace(_ fireplace: Fireplace) async {
+        guard let connection = fireplaceToConnection[fireplace.id] else {
+            logger.error("Unable to get connection for fireplace: \(fireplace.name)")
+            return
         }
         let command = Command.turnOff
         var commandValue = command.commandValue
-        print("sending command: \(command) (\(String(format: "0x%04x", commandValue)))")
+        logger.info("Sending command: \(String(describing: command)) (\(String(format: "0x%04x", commandValue)))")
         connection.send(content: Data(bytes: &commandValue, count: 2), completion: .contentProcessed { error in
             if let error = error {
-                print("got error sending: \(error)")
+                logger.error("Error sending turn off: \(error)")
             }
         })
-        return fireplace
     }
 }
 
+@MainActor
 class PreviewFireplaceService: FireplaceService {
     var defaultMinutes: UInt16 = 30
-    
+
     @Published var fireplaces: [Fireplace] = [
         .init(ipAddress: "a", name: "Living Room", status: .off),
         .init(ipAddress: "b", name: "Bedroom", status: .on(timeRemaining: 30.0 * 60.0)),
         .init(ipAddress: "c", name: "Dungeon", status: .off),
     ]
-    
-    func turnOnFireplace(_ fireplace: Fireplace, minutes: UInt16) async -> Fireplace {
+
+    func fireplaceUpdates() -> AsyncStream<[Fireplace]> {
+        AsyncStream { continuation in
+            let cancellable = $fireplaces
+                .removeDuplicates()
+                .sink { fireplaces in
+                    continuation.yield(fireplaces)
+                }
+            continuation.onTermination = { _ in
+                cancellable.cancel()
+            }
+        }
+    }
+
+    func turnOnFireplace(_ fireplace: Fireplace, minutes: UInt16) async {
         fireplaces = fireplaces.map { f in
             var new = f
             if f == fireplace {
@@ -171,10 +232,9 @@ class PreviewFireplaceService: FireplaceService {
             }
             return new
         }
-        return fireplaces.first(where: { $0 == fireplace })! // TODO(nsillik): Get rid of the `!`
     }
-    
-    func turnOffFireplace(_ fireplace: Fireplace) async -> Fireplace {
+
+    func turnOffFireplace(_ fireplace: Fireplace) async {
         fireplaces = fireplaces.map { f in
             var new = f
             if f == fireplace {
@@ -182,16 +242,15 @@ class PreviewFireplaceService: FireplaceService {
             }
             return new
         }
-        return fireplaces.first(where: { $0.id == fireplace.id })! // TODO(nsillik): Get rid of the `!`
     }
 }
 
-enum FireplaceServiceKey: DependencyKey {
-    static let liveValue: any FireplaceService = LiveFireplaceService(fireplaces: [
+enum FireplaceServiceKey: @preconcurrency DependencyKey {
+    @MainActor static let liveValue: any FireplaceService = LiveFireplaceService(fireplaces: [
         Fireplace(ipAddress: "192.168.1.81", name: "Bedroom", status: .off),
         Fireplace(ipAddress: "192.168.1.82", name: "Living Room", status: .off)
     ])
-    static let previewValue: any FireplaceService = PreviewFireplaceService()
+    @MainActor static let previewValue: any FireplaceService = PreviewFireplaceService()
 }
 
 extension DependencyValues {
