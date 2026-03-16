@@ -14,10 +14,10 @@ struct AppReducer {
     @ObservableState
     struct State {
         var availableFireplaces: [Fireplace] = []
-        var selectedFireplace: Fireplace = .init(ipAddress: "", name: "", status: .unknown)
+        var selectedFireplace: Fireplace? = nil
         var currentTime: UInt16 = 30
         var isOn: Bool {
-            if case .on = selectedFireplace.status {
+            if case .on = selectedFireplace?.status {
                 return true
             } else {
                 return false
@@ -38,6 +38,10 @@ struct AppReducer {
         Reduce { state, action in
             switch action {
             case .didLoad:
+                if state.selectedFireplace == nil {
+                    state.selectedFireplace = state.availableFireplaces.first
+                }
+                
                 return .run { send in
                     let fireplaces = await fireplaceService.fireplaces
                     await send(.fireplaceStatusUpdated(fireplaces))
@@ -47,9 +51,10 @@ struct AppReducer {
                 }
             case .fireplaceStatusUpdated(let fireplaces):
                 state.availableFireplaces = fireplaces
-                if let updated = fireplaces.first(where: { $0.id == state.selectedFireplace.id }) {
+                if let updated = fireplaces.first(where: { $0.id == state.selectedFireplace?.id }) {
                     state.selectedFireplace = updated
                 }
+
                 return .none
             case .selectFireplace(let fireplace):
                 guard let fireplace else { return .none }

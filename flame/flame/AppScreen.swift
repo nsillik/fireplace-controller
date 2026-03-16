@@ -20,8 +20,7 @@ struct AppScreen: View {
             BackgroundView(isOn: store.isOn)
             controlsView
             VStack {
-                Picker(options: store.availableFireplaces, currentlySelected: $store.selectedFireplace.sending(\.selectFireplace), placeholder: "SELECT FIREPLACE") { _ in
-                }
+                Picker(options: store.availableFireplaces, currentlySelected: $store.selectedFireplace.sending(\.selectFireplace), placeholder: "SELECT FIREPLACE")
                 Spacer()
             }
         }
@@ -59,10 +58,11 @@ struct AppScreen: View {
         // This is both the on and the off button
         Button(
             action: {
+                guard let selectedFireplace = store.selectedFireplace else { return }
                 if store.isOn {
-                    store.send(.turnOffFireplace(store.selectedFireplace))
+                    store.send(.turnOffFireplace(selectedFireplace))
                 } else {
-                    store.send(.turnOnFireplace(store.selectedFireplace))
+                    store.send(.turnOnFireplace(selectedFireplace))
                 }
             },
             label: {

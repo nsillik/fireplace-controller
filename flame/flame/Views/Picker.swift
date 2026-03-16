@@ -9,9 +9,8 @@ import SwiftUI
 
 struct Picker<T: CustomStringConvertible & Hashable>: View {
     let options: [T]
-    @Binding var currentlySelected: T
+    @Binding var currentlySelected: T?
     let placeholder: String
-    let selected: (T) -> Void
     @State var expanded = false
 
     var body: some View {
@@ -46,7 +45,6 @@ struct Picker<T: CustomStringConvertible & Hashable>: View {
                             .onTapGesture {
                                 expanded = !expanded
                                 currentlySelected = option
-                                selected(option)
                                 print(option)
                             }
                     }
@@ -78,7 +76,7 @@ struct Picker<T: CustomStringConvertible & Hashable>: View {
         case true:
             placeholder.uppercased()
         case false:
-            currentlySelected.description.uppercased()
+            currentlySelected?.description.uppercased() ?? "UNKNOWN"
         }
     }
 }
@@ -99,8 +97,6 @@ struct Picker_PreviewProvider: PreviewProvider {
                     options: ["Living Room", "Dining Room", "Dungeon"],
                     currentlySelected: .constant("Living Room"),
                     placeholder: "Select Fireplace",
-                    selected: { _ in
-                    },
                     expanded: true
                 )
                 Spacer()

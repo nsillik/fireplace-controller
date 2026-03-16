@@ -17,15 +17,11 @@ struct FlameApp: App {
     }
     
     var screen: some View {
-//         MainScreen<LiveFireplaceService>()
-//        .environmentObject(LiveFireplaceService(fireplaces: $fireplaces))
-//        .tint(Color.orange)
-//        .environment(\.colorScheme, .dark)
         AppScreen(
             store: Store(
                 initialState: AppReducer.State(
                     availableFireplaces: [],
-                    selectedFireplace: .init(ipAddress: "", name: "", status: .unknown)
+                    selectedFireplace: nil
                 ),
                 reducer: {
                     AppReducer()

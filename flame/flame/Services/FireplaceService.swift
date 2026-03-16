@@ -247,7 +247,7 @@ class PreviewFireplaceService: FireplaceService {
 
 enum FireplaceServiceKey: @preconcurrency DependencyKey {
     @MainActor static let liveValue: any FireplaceService = LiveFireplaceService(fireplaces: [
-        Fireplace(ipAddress: "192.168.1.81", name: "Bedroom", status: .off),
+        Fireplace(ipAddress: "192.168.1.83", name: "Bedroom", status: .off),
         Fireplace(ipAddress: "192.168.1.82", name: "Living Room", status: .off)
     ])
     @MainActor static let previewValue: any FireplaceService = PreviewFireplaceService()
